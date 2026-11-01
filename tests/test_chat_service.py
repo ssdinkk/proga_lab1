@@ -5,6 +5,7 @@ import pytest
 from domain.models.chat import Chat
 from application.services.chat_service import ChatService
 from infrastructure.repositories.in_memory_chat_repository import InMemoryChatRepository
+from domain.exceptions import ChatNotFoundException, DuplicateEntityException
 
 
 def test_create_and_get_chat():
@@ -24,7 +25,7 @@ def test_create_duplicate_chat():
     chat = Chat(id=1, title="Test chat", created_at=datetime.now())
     service.create_chat(chat)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(DuplicateEntityException):
         service.create_chat(chat)
 
 
@@ -43,5 +44,5 @@ def test_get_missing_chat():
     repository = InMemoryChatRepository()
     service = ChatService(repository)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ChatNotFoundException):
         service.get_chat(999)

@@ -1,5 +1,6 @@
 from domain.models.chat import Chat
 from application.interfaces.chat_repository import ChatRepository
+from domain.exceptions import ChatNotFoundException, DuplicateEntityException
 
 
 class ChatService:
@@ -8,7 +9,9 @@ class ChatService:
 
     def create_chat(self, chat: Chat) -> None:
         if self.chat_repository.get_by_id(chat.id) is not None:
-            raise ValueError(f"Чат с ID {chat.id} уже существует")
+            raise DuplicateEntityException(
+                f"Чат с ID {chat.id} уже существует"
+            )
 
         self.chat_repository.add(chat)
 
@@ -16,7 +19,9 @@ class ChatService:
         chat = self.chat_repository.get_by_id(chat_id)
 
         if chat is None:
-            raise ValueError(f"Чат с ID {chat_id} не найден")
+            raise ChatNotFoundException(
+                f"Чат с ID {chat_id} не найден"
+            )
 
         return chat
 

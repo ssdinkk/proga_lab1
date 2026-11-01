@@ -1,16 +1,17 @@
-
 from domain.models.user import User
 from application.interfaces.user_repository import UserRepository
+from domain.exceptions import UserNotFoundException, DuplicateEntityException
 
 
 class MessengerService:
-
     def __init__(self, user_repository: UserRepository):
         self.user_repository = user_repository
 
     def add_user(self, user: User) -> None:
         if self.user_repository.get_by_id(user.id) is not None:
-            raise ValueError(f"Пользователь с ID {user.id} уже существует")
+            raise DuplicateEntityException(
+                f"Пользователь с ID {user.id} уже существует"
+            )
 
         self.user_repository.add(user)
 
@@ -18,7 +19,9 @@ class MessengerService:
         user = self.user_repository.get_by_id(user_id)
 
         if user is None:
-            raise ValueError(f"Пользователь с ID {user_id} не найден")
+            raise UserNotFoundException(
+                f"Пользователь с ID {user_id} не найден"
+            )
 
         return user
 
